@@ -1,8 +1,8 @@
 //============================================================================
 // Name         : Multi-language dictionary
-// Author       : Khalid Mengal
+// Author       : Amanuel Nigussie Demeke
 // Version      : 1.0
-// Date Created : 
+// Date Created : April 29, 2024
 // Date Modified: 
 // Description  : HashTable Implementation using C++
 //============================================================================

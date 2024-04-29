@@ -1,7 +1,17 @@
+//============================================================================
+// Name         : Multi-language dictionary
+// Author       : Amanuel Nigussie Demeke
+// Version      : 1.0
+// Date Created : April 29, 2024
+// Date Modified: 
+// Description  : HashTable Implementation using C++
+//============================================================================
 
 #ifndef _HASHTABLE
 #define _HASHTABLE
 #include <vector>
+#include <string>
+
 using namespace std;
 
 
