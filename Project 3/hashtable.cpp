@@ -142,14 +142,17 @@ void HashTable::import(string path)
 		exit (1);
 	}
 	string line, zlanguage, zword, zmeanings;
-	zfile >> zlanguage;
+	getline(zfile, zlanguage);
+	int count = 0;
 	while (getline(zfile, line)) {
 		stringstream s(line);
 		getline(s, zword, ':');
 		getline(s, zmeanings);
 		this->insert(zword, zmeanings, zlanguage);
+		count++;
 	}
 	zfile.close();
+	cout << count << " " << zlanguage << " words have been imported successfully." << endl;
 }
 //============================================================================
 
@@ -181,7 +184,7 @@ void HashTable::delWord(string word)
 			}
 			index = (index + 1) % capacity;
 		} while (this->buckets[index] != nullptr);
-		cout << word << "not found in the Dictionary." << endl;
+		cout << word << " not found in the Dictionary." << endl;
 	}
 }
 //============================================================================
@@ -236,7 +239,7 @@ void HashTable::delTranslation(string word, string language)
 			}
 			index = (index + 1) % capacity;
 		} while (this->buckets[index] != nullptr);
-		cout << word << "not found in the Dictionary." << endl;
+		cout << word << " not found in the Dictionary." << endl;
 	}
 }
 //============================================================================
@@ -274,7 +277,7 @@ void HashTable::delMeaning(string word, string meaning, string language)
 			}
 			index = (index + 1) % capacity;
 		} while (this->buckets[index] != nullptr);
-		cout << word << "not found in the Dictionary." << endl;
+		cout << word << " not found in the Dictionary." << endl;
 	}
 }
 //============================================================================
@@ -282,13 +285,16 @@ void HashTable::delMeaning(string word, string meaning, string language)
 void HashTable::exportData(string language, string filePath)
 {
 	ofstream zfile(filePath);
+	int count = 0;
 	if (!zfile.is_open()) {
 		cerr << "File not found";
 		exit(1);
 	}
+	zfile << language << endl;
 	for (int i = 0; i < this->capacity; i++) {
 		if (this->buckets[i] != nullptr && !this->buckets[i]->deleted) {
 			zfile << this->buckets[i]->word << ":";
+			count++;
 			for (int j = 0; j < this->buckets[i]->translations.size(); j++) {
 				if (this->buckets[i]->translations[j].language == language) {
 					for (int k = 0; k < this->buckets[i]->translations[j].meanings.size(); k++) {
@@ -304,6 +310,7 @@ void HashTable::exportData(string language, string filePath)
 		}
 	}
 	zfile.close();
+	cout << count << " records have been successfully exported to " << filePath << endl;
 }
 //============================================================================
 
@@ -330,7 +337,7 @@ void HashTable::find(string word)
 			index = (index + 1) % capacity;
 			count++;
 		} while (this->buckets[index] != nullptr);
-		cout << word << "not found in the Dictionary." << endl;
+		cout << word << " not found in the Dictionary." << endl;
 	}
 }
 //============================================================================
