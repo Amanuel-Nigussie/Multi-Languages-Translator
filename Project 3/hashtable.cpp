@@ -66,6 +66,34 @@ void Translation::display()
 }
 //============================================================================
 
-Entry::Entry(string word, string meanings, string language);
-void addTranslation(string newMeanings, string language);
-void print();
+Entry::Entry(string word, string meanings, string language)
+{
+	this->word = word;
+	Translation t(meanings, language);
+	this->translations.push_back(t);
+	this->deleted = false;
+}
+//============================================================================
+
+void Entry::addTranslation(string newMeanings, string language)
+{
+	for (int i = 0; i < this->translations.size(); i++) {
+		if (this->translations[i].language == language) {
+			this->translations[i].addMeaning(newMeanings);
+			return;
+		}
+	}
+	Translation t(newMeanings, language);
+	this->translations.push_back(t);
+}
+//============================================================================
+
+void Entry::print()
+{
+	for (int i = 0; i < this->translations.size(); i++) {
+		this->translations[i].display();
+	}
+}
+//============================================================================
+
+
