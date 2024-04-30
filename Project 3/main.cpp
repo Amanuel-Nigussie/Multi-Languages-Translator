@@ -31,8 +31,8 @@ void help()
 int main(int argc, char** args)
 {
 	HashTable myHashTable(1171891);//(2124867);
-	//myHashTable.import("en-de.txt");
-	myHashTable.import("en-fr.txt");
+	myHashTable.import("en-de.txt");
+	//myHashTable.import("en-fr.txt");
 	//myHashTable.import("en-es.txt");
 
 
