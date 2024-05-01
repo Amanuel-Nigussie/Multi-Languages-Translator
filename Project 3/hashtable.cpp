@@ -164,13 +164,19 @@ void HashTable::addWord(string word, string meanings, string language)
 
 void HashTable::delWord(string word)
 {
-	unsigned long index = this->hashCode(word);
+	string lword = word;
+	for (int i = 0; i < word.length(); i++) {
+		if (word[i] >= 'A' && word[i] <= 'Z') {
+			lword[i] = word[i] + 32;
+		}
+	}
+	unsigned long index = this->hashCode(lword);
 	if (this->buckets[index] == nullptr) {
 		cout << word << " not found in the Dictionary." << endl;
 	}
 	else {
 		do {
-			if (this->buckets[index]->word == word) {
+			if (this->buckets[index]->word == lword) {
 				if (buckets[index]->deleted) {
 					cout << word << " not found in the Dictionary." << endl;
 					return;
@@ -223,13 +229,19 @@ void HashTable::insert(string word, string meanings, string language)
 
 void HashTable::delTranslation(string word, string language)
 {
-	unsigned long index = this->hashCode(word);
+	string lword = word;
+	for (int i = 0; i < word.length(); i++) {
+		if (word[i] >= 'A' && word[i] <= 'Z') {
+			lword[i] = word[i] + 32;
+		}
+	}
+	unsigned long index = this->hashCode(lword);
 	if (this->buckets[index] == nullptr) {
 		cout << word << " not found in the Dictionary." << endl;
 	}
 	else {
 		do {
-			if (this->buckets[index]->word == word) {
+			if (this->buckets[index]->word == lword) {
 				if (buckets[index]->deleted) {
 					cout << word << " not found in the Dictionary." << endl;
 					return;
@@ -255,13 +267,19 @@ void HashTable::delTranslation(string word, string language)
 
 void HashTable::delMeaning(string word, string meaning, string language)
 {
-	unsigned long index = this->hashCode(word);
+	string lword = word;
+	for (int i = 0; i < word.length(); i++) {
+		if (word[i] >= 'A' && word[i] <= 'Z') {
+			lword[i] = word[i] + 32;
+		}
+	}
+	unsigned long index = this->hashCode(lword);
 	if (this->buckets[index] == nullptr) {
 		cout << word << " not found in the Dictionary." << endl;
 	}
 	else {
 		do {
-			if (this->buckets[index]->word == word) {
+			if (this->buckets[index]->word == lword) {
 				if (buckets[index]->deleted) {
 					cout << word << " not found in the Dictionary." << endl;
 					return;
