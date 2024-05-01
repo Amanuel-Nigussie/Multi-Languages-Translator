@@ -362,7 +362,7 @@ void HashTable::find(string word)     // Find a word in the dictionary
 					cout << word << " not found in the Dictionary." << endl;     // Display a message
 					return;     // Return
 				}
-				else {
+				else {     // If the bucket is not deleted
 					cout << word << " found in the Dictionary after " << count << " comparisons." << endl;     // Display a message
 					this->buckets[index]->print();      // Print the word and its translations
 					return;     // Return
