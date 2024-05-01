@@ -12,6 +12,7 @@
 #include <sstream>
 #include <iomanip>
 #include <fstream>
+#include <cmath>
 
 Translation::Translation(string meanings, string language)     // Constructor
 {
@@ -112,12 +113,31 @@ HashTable::HashTable(int capacity)       // Constructor
 unsigned long HashTable::hashCode(string word)      // Hash function
 {
 	unsigned long hash = 0;      // Initialize the hash to 0
-	int shift = 5;      // Set the shift to 5
-
+	
+	/*     // Cyclic shifting Hashing
 	for (int i = 0; i < word.length(); i++) {     // Loop through the word
-		hash = (hash << shift) | (hash >> (32 - shift));      // Shift the hash
-		hash += (unsigned long)word[i];       // Add the ASCII value of the character to the hash
+		hash = (hash << 5) | (hash >> 27);      // Shift the hash
+		hash += (unsigned long)word[i];       // Add the ASCII value of the character to the hash 
+	} */
+
+
+	/*     // Multiplication Hashing
+	for (int i = 0; i < word.length(); i++) {      // Loop through the word
+		hash = ((hash * 31) + word[i]) % capacity;      // Add the ASCII value of the character to the hash
+	} */
+	
+	// Jenkins Hashing
+	for (int i = 0; i < word.length(); i++) {      // Loop through the word
+		hash += word[i];      // Add the ASCII value of the character to the hash
+		hash += (hash << 10);       // Shift the hash
+		hash ^= (hash >> 6);       // XOR the hash
 	}
+
+	hash += (hash << 3);      // Shift the hash
+	hash ^= (hash >> 11);      // XOR the hash
+	hash += (hash << 15);      // Shift the hash 
+	
+	
 	return hash % this->capacity;      // Return the hash modulo the capacity
 }
 //============================================================================
@@ -158,9 +178,40 @@ void HashTable::import(string path)       // Import a dictionary file
 
 void HashTable::addWord(string word, string meanings, string language)     // Add a word to the dictionary
 {
-	this->insert(word, meanings, language);      // Insert the word, meanings, and language
-	cout << word << " has been successfully added to the Dictionary." << endl;      // Display a success message
+	bool vword = false;     // Create a boolean variable to check if the word is valid
+	bool vmeanings = false;      // Create a boolean variable to check if the meanings are valid
+	bool vlanguage = false;     // Create a boolean variable to check if the language is valid
+
+	for (int i = 0; i < word.length(); ++i) {      // Loop through the word
+		if (!isspace(word[i])) {      // Check if the character is not whitespace
+			vword = true;      // Set the vword variable to true
+			break;      // Break the loop
+		}       
+	}
+
+	for (int i = 0; i < meanings.length(); ++i) {      // Loop through the meanings
+		if (!isspace(meanings[i])) {      // Check if the character is not whitespace
+			vmeanings = true;      // Set the vmeanings variable to true
+			break;      // Break the loop
+		}
+	}
+
+	for (int i = 0; i < language.length(); ++i) {      // Loop through the language
+		if (!isspace(language[i])) {      // Check if the character is not whitespace
+			vlanguage = true;      // Set the vlanguage variable to true
+			break;      // Break the loop
+		}
+	}
+
+	if (vword && vlanguage && vmeanings) {      // Check if the word, meanings, and language are valid
+		this->insert(word, meanings, language);      // Insert the word, meanings, and language
+		cout << word << " has been successfully added to the Dictionary." << endl;      // Display a message
+	}
+	else {
+		cout << "Invalid input. Word, meanings, and language must not be empty or whitespace." << endl;      // Display a message
+	}
 }
+
 //============================================================================
 
 void HashTable::delWord(string word)      // Delete a word from the dictionary
@@ -251,6 +302,10 @@ void HashTable::delTranslation(string word, string language)      // Delete a tr
 					for (int i = 0; i < this->buckets[index]->translations.size(); i++) {      // Loop through the translations vector
 						if (this->buckets[index]->translations[i].language == language) {      // Check if the language is found
 							this->buckets[index]->translations.erase(this->buckets[index]->translations.begin() + i);     // Delete the translation
+							if (this->buckets[index]->translations.size() == 0) {      // Check if the translations vector is empty
+								this->buckets[index]->deleted = true;      // Set the deleted variable to true
+								this->size--;      // Decrement the size
+							}
 							cout << "Translation of " << word << " in " << language << " has been successfully deleted from the Dictionary." << endl;      // Display a message
 							return;      // Return
 						}
@@ -291,6 +346,13 @@ void HashTable::delMeaning(string word, string meaning, string language)      //
 							for (int j = 0; j < this->buckets[index]->translations[i].meanings.size(); j++) {      // Loop through the meanings vector
 								if (this->buckets[index]->translations[i].meanings[j] == meaning) {      // Check if the meaning is found
 									this->buckets[index]->translations[i].meanings.erase(this->buckets[index]->translations[i].meanings.begin() + j);      // Delete the meaning
+									if (this->buckets[index]->translations[i].meanings.size() == 0) {      // Check if the meanings vector is empty
+										this->buckets[index]->translations.erase(this->buckets[index]->translations.begin() + i);      // Delete the translation
+									}
+									if (this->buckets[index]->translations.size() == 0) {      // Check if the translations vector is empty
+										this->buckets[index]->deleted = true;      // Set the deleted variable to true
+										this->size--;      // Decrement the size
+									}
 									cout << "Meaning of " << word << " in " << language << " has been successfully deleted from the Dictionary." << endl;      // Display a message
 									return;      // Return
 								}
@@ -316,7 +378,7 @@ void HashTable::exportData(string language, string filePath)     // Export a dic
 	int count = 0;      // Initialize the count to 0
 	if (!zfile.is_open()) {     // Check if the file is open
 		cerr << "File not found";     // Display an error message
-		exit(1);     // Exit the program
+		return;      // Return
 	}
 	zfile << language << endl;     // Write the language to the file
 	for (int i = 0; i < this->capacity; i++) {      // Loop through the array
@@ -378,7 +440,7 @@ void HashTable::find(string word)     // Find a word in the dictionary
 
 HashTable::~HashTable()      // Destructor
 {
-	for (int i = 0; i < capacity; i++) {     // Loop through the array
+	for (int i = 0; i < this->capacity; i++) {     // Loop through the array
 		if (this->buckets[i] != nullptr) {     // Check if the bucket is not empty
 			delete this->buckets[i];     // Delete the bucket
 		}
