@@ -191,22 +191,31 @@ void HashTable::delWord(string word)
 
 void HashTable::insert(string word, string meanings, string language)
 {
-	Entry* e = new Entry(word, meanings, language);
+	for (int i = 0; i < word.length(); i++) {
+		if (word[i] >= 'A' && word[i] <= 'Z') {
+			word[i] = word[i] + 32;
+		}
+	}
 	unsigned long index = this->hashCode(word);
-	if (this->buckets[index] == nullptr || buckets[index]->deleted) {
-		this->buckets[index] = e;
+	if (this->buckets[index] == nullptr) {
+		this->buckets[index] = new Entry(word, meanings, language);
 		this->size++;
 	}
 	else {
 		do {      
-			if (buckets[index]->word == word) {      
-				buckets[index]->addTranslation(meanings, language);
-				return;     
+			if (buckets[index]->word == word) { 
+				if (buckets[index]->deleted) {
+					buckets[index] = new Entry(word, meanings, language);
+				}
+				else {
+					buckets[index]->addTranslation(meanings, language);
+					return;
+				}
 			}
 			index = (index + 1) % capacity;     
 			collisions++;      
 		} while (buckets[index] != nullptr && !buckets[index]->deleted);  
-		buckets[index] = e;
+		buckets[index] = new Entry(word, meanings, language);
 		size++;      
 	}
 }
@@ -316,14 +325,20 @@ void HashTable::exportData(string language, string filePath)
 
 void HashTable::find(string word)
 {
-	unsigned long index = this->hashCode(word);
+	string lword = word;
+	for (int i = 0; i < word.length(); i++) {
+		if (word[i] >= 'A' && word[i] <= 'Z') {
+			lword[i] = word[i] + 32;
+		}
+	}
+	unsigned long index = this->hashCode(lword);
 	int count = 1;
 	if (this->buckets[index] == nullptr) {
 		cout << word << " not found in the Dictionary." << endl;
 	}
 	else {
 		do {
-			if (this->buckets[index]->word == word) {
+			if (this->buckets[index]->word == lword) {
 				if (buckets[index]->deleted) {
 					cout << word << " not found in the Dictionary." << endl;
 					return;
